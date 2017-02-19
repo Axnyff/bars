@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style type="text/css">
+html, body { height: 100%; margin: 0; padding: 0; }
+#map { height: 90%; position: relative; top: 10%; }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script type="text/javascript">
+var listeBars = [
+    "L'escale",
+    "Chez Pierrot",
+    "Dirty Dick",
+    "Pub St Hilaire",
+    "Le Komptoir",
+    "L'Alibi",
+    "Medusa Bar",
+    "Le Calbar",
+    "Les Caves Alliées",
+    "La Belette Qui Tète",
+    "hoppy corner",
+    "Marlusse Et Lapin",
+    "Le Lock Groove",
+    "Aux Folies",
+    "Hurling Pub",
+    "Le Chateau D'Eau",
+    "Inside Bar",
+    "L'envol Québecois",
+    "express de lyon",
+    "Rollin's Pub",
+    "le p'tit bar",
+    "Paname Brewing Company",
+    "The Bootlagers",
+    "Au Caveau Montpensier",
+    "Monsieur le Zinc",
+    "Supercoin",
+    "Les Trois 8",
+    "The bombardier",
+    "Le Mayflower",
+    "La cuba compagnie",
+    "Bar Demory",
+    "Le bistro du forum",
+    "Le Tape Bar",
+    "James Hetfeeld's Pub",
+    "Le Coeur Fou",
+    "La Boissonnière",
+    "IPN",
+    "Le Gob",
+    "La Tireuse",
+    "THE BRKLYN",
+    "Bar & Beers",
+    "Le Lèche Vin"
+];
+var map;
+function createMarker(position, title) {
+    var marker = new google.maps.Marker({
+        map,
+        position,
+        title
+    });
+
+}
+var index = 0;
+function createMarkerFromData([data]) {
+    position = data.geometry.location;
+    title = data.name + "\n" + data.vicinity;
+    createMarker(position, title);
+}
+
+function createAbar(){
+    var name = listeBars[index];
+    if (name === undefined) {
+        return;
+    }
+    index++;
+    service.nearbySearch({
+        name:name,
+        location: center,
+        "types": ["bar", "pub", "establishment"],
+        "radius": 5000}, createMarkerFromData );
+    window.setTimeout(function(){
+        createAbar();
+    }, 500);
+}
+function getBarsFromData(data) {
+    data.forEach(function (el) {
+        createMarkerFromData([el], true);
+    });
+}
+
+function initMap() {
+    center = new google.maps.LatLng({
+        lat: 48.864716, lng: 2.349014
+    });
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 48.864716, lng: 2.349014},
+        zoom: 13
+    });
+    map.addListener("click", function(e){
+        service.nearbySearch({
+            location: e.latLng,
+            types: ["bar"],
+            openNow: true,
+            radius: 300
+        }, getBarsFromData);
+    });
+    service = new google.maps.places.PlacesService(map);
+    createAbar();
+}
+        </script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD61kngp7SZSmlRGO1bRGCOLXXZySI_9i4&callback=initMap&libraries=places">
+        </script>
+    </body>
+</html>
